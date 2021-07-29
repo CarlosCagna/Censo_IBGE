@@ -198,28 +198,22 @@ class DadosCenso:
         def download_file(url, folder_name):
             local_filename = url.split('/')[-1]
             path = os.path.join("{}/{}".format(folder_name, local_filename))
-            try:
-                with requests.get(url, stream=True) as r:
-                    with open(path, 'wb') as f:
-                        shutil.copyfileobj(r.raw, f)
-                progress.setValue(self.i + 1)
-                self.i = self.i + 1
-            except Exception:
-                traceback.print_exc()
+            with requests.get(url, stream=True) as r:
+                with open(path, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+            progress.setValue(self.i + 1)
+            self.i = self.i + 1
             return local_filename
 
         def baixa_setores(UF, UF_codigo, pasta):
             dict_arquivos = {'_distritos.zip':'DSE250GC_SIR.shp', '_municipios.zip':'MUE250GC_SIR.shp', '_subdistritos.zip':'SDE250GC_SIR.shp', '_setores_censitarios.zip':'SEE250GC_SIR.shp'}
             for item in dict_arquivos.keys():
-                print (UF, item)
                 if UF == 'GO' and item == '_setores_censitarios.zip':
                     url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/go/go_setores%20_censitarios.zip"
-                    print(url)
                     download_file(url, pasta)
                 else:    
                     if not os.path.isfile(pasta+'/'+UF_codigo+dict_arquivos[item]):  
                         url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/{0}/{0}{1}".format(UF.lower(), item)
-                        print(url)
                         download_file(url, pasta)
                         with zipfile.ZipFile(pasta+'/'+UF.lower()+item, 'r') as zip_ref:
                             zip_ref.extractall(pasta)     
@@ -237,12 +231,8 @@ class DadosCenso:
                 
             caminho_planilha = '{0}/dados_IBGE/{1}/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, UF,  'Basico')        
             if not os.path.isfile(caminho_planilha):    
-                url= "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010/Resultados_do_Universo/Agregados_por_Setores_Censitarios/{0}{1}.zip".format(UF, arquivo)
-                print(url)                
-                try: 
-                    download_file(url, pasta)
-                except Exception:
-                    traceback.print_exc()    
+                url= "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010/Resultados_do_Universo/Agregados_por_Setores_Censitarios/{0}{1}.zip".format(UF, arquivo)               
+                download_file(url, pasta)   
                 with zipfile.ZipFile(pasta+'/'+UF+arquivo+'.zip', 'r') as zip_ref:
                     zip_ref.extractall(pasta)        
                 os.remove(pasta+'/'+UF+arquivo+'.zip') 
@@ -280,20 +270,32 @@ class DadosCenso:
                             os.rename(pasta_alvo+"/"+filename, pasta_alvo+"/"+filename.split('SP')[0]+UF+'.csv')
                         elif '_sp' in filename: 
                             os.rename(pasta_alvo+"/"+filename, pasta_alvo+"/"+filename.split('_sp')[0]+'_'+UF+'.csv')
-                            
-        progressMessageBar = self.iface.messageBar().createMessage("Baixando dados do Estado...")
-        progress = QProgressBar()
-        progress.setMaximum(5)
-        progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
-        progressMessageBar.layout().addWidget(progress)
-        self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
-        self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
-        self.i = 0
-        pasta = self.plugin_dir+'/dados_IBGE'
-        baixa_setores(UF[:2], UF_codigo, pasta)
-        baixa_dados(UF, pasta, estado)
-        self.iface.messageBar().clearWidgets()
-        arruma_pastas(UF, pasta, estado)
+
+        url = 'https://geoftp.ibge.gov.br/'
+        conexao = ''
+        try:
+            response = requests.get(url)
+            conexao = True
+        except requests.ConnectionError as exception:
+            conexao = False
+            
+        if conexao == True:
+       
+            progressMessageBar = self.iface.messageBar().createMessage("Baixando dados do Estado...")
+            progress = QProgressBar()
+            progress.setMaximum(5)
+            progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+            progressMessageBar.layout().addWidget(progress)
+            self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+            self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+            self.i = 0
+            pasta = self.plugin_dir+'/dados_IBGE'
+            baixa_setores(UF[:2], UF_codigo, pasta)
+            baixa_dados(UF, pasta, estado)
+            self.iface.messageBar().clearWidgets()
+            arruma_pastas(UF, pasta, estado)
+        else:
+            self.iface.messageBar().pushMessage("Não foi possível acessar a url:" +url, Qgis.Critical)         
         
     def popula_municipios(self, codigo_UF, estado):
         self.dlg.municipioComboBox.clear()
@@ -339,7 +341,6 @@ class DadosCenso:
         self.lista_categoriza = self.dlg.listBox_selecionados.selectedItems()
         texto = ''
         for x in self.lista_categoriza:
-            print(x.text()[:4])
             texto =  texto + x.text()[:4] + ' + '
         self.dlg.textBrowser_soma.setText(texto[:-3])
 
@@ -347,11 +348,9 @@ class DadosCenso:
         self.lista_divide = self.dlg.listBox_selecionados.selectedItems()
         texto = ''
         for x in self.lista_divide:
-            print(x.text()[:4])
             texto =  texto + x.text()[:4] + ' + '
         self.dlg.textBrowser_divi.setText(texto[:-3])    
-    
-    
+      
     def uni_setor_atributos(self, QListWidget, estado, codigo_estado, municipio):
         dict_dados = {}
         lst = QListWidget
