@@ -37,6 +37,7 @@ import zipfile
 import ast
 import processing
 import subprocess
+import webbrowser
 
 lista_estados = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '33') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo - exceto capital':('SP_Exceto_a_Capital', '35') , 'São Paulo - Capital':('SP_Capital', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}		 
 lista_municipios = {}
@@ -208,16 +209,21 @@ class DadosCenso:
         def baixa_setores(UF, UF_codigo, pasta):
             dict_arquivos = {'_distritos.zip':'DSE250GC_SIR.shp', '_municipios.zip':'MUE250GC_SIR.shp', '_subdistritos.zip':'SDE250GC_SIR.shp', '_setores_censitarios.zip':'SEE250GC_SIR.shp'}
             for item in dict_arquivos.keys():
-                if UF == 'GO' and item == '_setores_censitarios.zip':
-                    url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/go/go_setores%20_censitarios.zip"
-                    download_file(url, pasta)
-                else:    
-                    if not os.path.isfile(pasta+'/'+UF_codigo+dict_arquivos[item]):  
-                        url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/{0}/{0}{1}".format(UF.lower(), item)
+                if not os.path.isfile(pasta+'/'+UF_codigo+dict_arquivos[item]):  
+                    if UF == 'GO' and item == '_setores_censitarios.zip':
+                        url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/go/go_setores%20_censitarios.zip"
                         download_file(url, pasta)
-                        with zipfile.ZipFile(pasta+'/'+UF.lower()+item, 'r') as zip_ref:
+                        with zipfile.ZipFile(pasta+'/'+UF.lower()+'_setores%20_censitarios.zip', 'r') as zip_ref:
                             zip_ref.extractall(pasta)     
-                        os.remove(pasta+'/'+UF.lower()+item)        
+                        os.remove(pasta+'/'+UF.lower()+'_setores%20_censitarios.zip')        
+                        
+                        
+                    else:    
+                            url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/{0}/{0}{1}".format(UF.lower(), item)
+                            download_file(url, pasta)
+                            with zipfile.ZipFile(pasta+'/'+UF.lower()+item, 'r') as zip_ref:
+                                zip_ref.extractall(pasta)     
+                            os.remove(pasta+'/'+UF.lower()+item)        
 
         def baixa_dados(UF, pasta, estado):
             if UF[:2] != 'SP' and UF != 'PE':
@@ -246,7 +252,6 @@ class DadosCenso:
                     arquivo = 'Base informaçoes setores2010 universo '+ UF
                     shutil.move((pasta+"/"+arquivo), (pasta+'/'+UF+'/'+arquivo)) 
                     
-
                 elif UF == 'PE':
                     arquivo = 'PE_20171016'
                     shutil.move((pasta+"/"+arquivo+"/"+UF), (pasta+"/"+UF)) 
@@ -333,10 +338,12 @@ class DadosCenso:
             qIndex = origem.indexFromItem(selectedItem)
             model.removeRow(qIndex.row())    
 
-    def abre_pdf(self):
-        path = self.plugin_dir+u'\BASE DE INFORMAÇÕES POR SETOR CENSITÁRIO Censo 2010 - Universo.pdf'
-        subprocess.Popen([path], shell=True)
-    
+    def abre_html(self):
+        path =  'file:///'+self.plugin_dir+u'\documento.htm'
+        webbrowser.open_new_tab(path)
+
+
+         
     def seleciona_categoriza(self):
         self.lista_categoriza = self.dlg.listBox_selecionados.selectedItems()
         texto = ''
@@ -365,6 +372,7 @@ class DadosCenso:
                 dict_dados[planilha].append(coluna)
         
         layer_setores = QgsVectorLayer(self.plugin_dir+'\dados_IBGE\\'+codigo_estado+'SEE250GC_SIR.shp', "setores", "ogr")
+        #QgsProject.instance().addMapLayer(layer_setores)
         if municipio != '':
             # Extrair por atributo
             alg_params = {
@@ -512,7 +520,7 @@ class DadosCenso:
         self.dlg.pushButton_RetiraTodos.clicked.connect(lambda:self.movimenta_item(self.dlg.listBox_selecionados, self.dlg.listBox_disponiveis, True)) 
         self.dlg.pushButton_categoriza.clicked.connect(lambda:self.seleciona_categoriza())  
         self.dlg.pushButton_divi.clicked.connect(lambda:self.seleciona_divide())
-        self.dlg.pushButton_Doc.clicked.connect(lambda:self.abre_pdf())
+        self.dlg.pushButton_Doc.clicked.connect(lambda:self.abre_html())
 
 
         # Run the dialog event loop
