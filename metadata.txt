@@ -5,12 +5,12 @@
 [general]
 name=Censo IBGE
 qgisMinimumVersion=3.0
-description=baixa os setores dos censos do IBGE juntando com os resultados dos setores escolhidos, os dados são baixados do https://ftp.ibge.gov.br/.
+description = baixa os setores dos censos do IBGE juntando com os resultados dos setores escolhidos, podendo escoher qual os dados serão agregados aos setores. Atualmente só os dados do censo 2010 estão disponíveis.    
 version=0.1
 author=Carlos Eduardo Cagna
 email=carlos_cagna@yahoo.com.br
 
-about=baixa os setores dos censos do IBGE juntando com os resultados por setores escolhidos, os dados são baixados do https://ftp.ibge.gov.br/ e https://geoftp.ibge.gov.br/.
+about=baixa os setores dos censos do IBGE juntando com os resultados dos setores escolhidos, podendo escoher qual os dados serão agregados aos setores. os dados são baixados do https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010/Resultados_do_Universo/Agregados_por_Setores_Censitarios/ e os setores do  https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/
 
 tracker=https://github.com/CarlosCagna/Censo_IBGE/issues
 repository=https://github.com/CarlosCagna/Censo_IBGE
@@ -25,7 +25,7 @@ hasProcessingProvider=no
 # Tags are comma separated with spaces allowed
 tags=ibge setores
 
-homepage=
+homepage=https://github.com/CarlosCagna/Censo_IBGE
 category=Web
 icon=icon.png
 # experimental flag
