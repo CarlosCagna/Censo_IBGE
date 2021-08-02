@@ -199,7 +199,7 @@ class DadosCenso:
         def download_file(url, folder_name):
             local_filename = url.split('/')[-1]
             path = os.path.join("{}/{}".format(folder_name, local_filename))
-            with requests.get(url, stream=True) as r:
+            with requests.get(url, stream=True, verify=False) as r:
                 with open(path, 'wb') as f:
                     shutil.copyfileobj(r.raw, f)
             progress.setValue(self.i + 1)
@@ -279,9 +279,10 @@ class DadosCenso:
         url = 'https://geoftp.ibge.gov.br/'
         conexao = ''
         try:
-            response = requests.get(url)
+            response = requests.get(url, verify=False)
             conexao = True
         except requests.ConnectionError as exception:
+            print (exception)
             conexao = False
             
         if conexao == True:
