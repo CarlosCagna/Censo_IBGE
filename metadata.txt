@@ -6,7 +6,7 @@
 name=Censo IBGE
 qgisMinimumVersion=3.0
 description = Download the IBGE (Brazilian Institute of Geography and Statistics) census sectors and the data linked to them. Only 2010 census data is currently available. Baixa os setores dos censos do IBGE juntando com os resultados dos censo agregados por setor, podendo escoher qual os dados e tabelas baixar. Atualmente só os dados do censo 2010 estão disponíveis.    
-version=0.21
+version=0.30
 author=Carlos Eduardo Cagna
 email=carlos_cagna@yahoo.com.br
 
@@ -20,7 +20,9 @@ repository=https://github.com/CarlosCagna/Censo_IBGE
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog=
+# changelog= v0.30
+				-Funcionando no Linux
+				-Manual inserido	
 
 # Tags are comma separated with spaces allowed
 tags=ibge setores

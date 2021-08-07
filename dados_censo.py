@@ -308,7 +308,7 @@ class DadosCenso:
         if estado == 'SP_Capital':
             self.lista_municipios = {'São paulo':'3550308'}
         else:
-            self.layer_municipios = QgsVectorLayer(self.plugin_dir+'\dados_IBGE\\'+codigo_UF+'MUE250GC_SIR.shp', "municpios", "ogr")
+            self.layer_municipios = QgsVectorLayer(self.plugin_dir+'/dados_IBGE/'+codigo_UF+'MUE250GC_SIR.shp', "municpios", "ogr")
             self.lista_municipios = {'':''}
 
             for municipio in self.layer_municipios.getFeatures():
@@ -339,12 +339,14 @@ class DadosCenso:
             qIndex = origem.indexFromItem(selectedItem)
             model.removeRow(qIndex.row())    
 
-    def abre_html(self):
-        path =  'file:///'+self.plugin_dir+u'\documento.htm'
+    def abre_doc(self):
+        path =  'file:///'+self.plugin_dir+u'/BASE DE INFORMACOES POR SETOR CENSITARIO Censo 2010 - Universo.pdf'
         webbrowser.open_new_tab(path)
-
-
-         
+ 
+    def abre_manual(self):
+        path =  'file:///'+self.plugin_dir+u'/Manual.pdf'
+        webbrowser.open_new_tab(path)
+        
     def seleciona_categoriza(self):
         self.lista_categoriza = self.dlg.listBox_selecionados.selectedItems()
         texto = ''
@@ -372,7 +374,7 @@ class DadosCenso:
             else:
                 dict_dados[planilha].append(coluna)
         
-        layer_setores = QgsVectorLayer(self.plugin_dir+'\dados_IBGE\\'+codigo_estado+'SEE250GC_SIR.shp', "setores", "ogr")
+        layer_setores = QgsVectorLayer(self.plugin_dir+'/dados_IBGE/'+codigo_estado+'SEE250GC_SIR.shp', "setores", "ogr")
         #QgsProject.instance().addMapLayer(layer_setores)
         if municipio != '':
             # Extrair por atributo
@@ -427,7 +429,7 @@ class DadosCenso:
             
         QgsProject.instance().addMapLayer(layer_setores)
         layer_setores.setName('Setores_censitários')
-        layer_setores.loadNamedStyle(self.plugin_dir+'\estilos_camadas\setores.qml')  
+        layer_setores.loadNamedStyle(self.plugin_dir+'/estilos_camadas/setores.qml')  
         layer_setores.triggerRepaint()   
         if self.dlg.textBrowser_soma.toPlainText() != '':
             lista_cat = []
@@ -465,7 +467,7 @@ class DadosCenso:
     def carrega_demais_camadas(self, estado, codigo_estado, municipio):
         dict_camadas = {'DSE250GC_SIR.shp':['Distrito','CD_GEOCODD'],'MUE250GC_SIR.shp': ['Município', 'CD_GEOCODM'], 'SDE250GC_SIR.shp':['Subdistrito', 'CD_GEOCODS']} 
         for camada in dict_camadas.keys():
-            layer = QgsVectorLayer(self.plugin_dir+'\dados_IBGE\\'+codigo_estado+camada, dict_camadas[camada][0], "ogr")           
+            layer = QgsVectorLayer(self.plugin_dir+'/dados_IBGE/'+codigo_estado+camada, dict_camadas[camada][0], "ogr")           
             if municipio != '':
                 # Extrair por atributo
                 alg_params = {
@@ -521,7 +523,9 @@ class DadosCenso:
         self.dlg.pushButton_RetiraTodos.clicked.connect(lambda:self.movimenta_item(self.dlg.listBox_selecionados, self.dlg.listBox_disponiveis, True)) 
         self.dlg.pushButton_categoriza.clicked.connect(lambda:self.seleciona_categoriza())  
         self.dlg.pushButton_divi.clicked.connect(lambda:self.seleciona_divide())
-        self.dlg.pushButton_Doc.clicked.connect(lambda:self.abre_html())
+        self.dlg.pushButton_Doc.clicked.connect(lambda:self.abre_doc())
+        self.dlg.pushButton_Manual.clicked.connect(lambda:self.abre_manual())
+
 
 
         # Run the dialog event loop

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>552</width>
-    <height>584</height>
+    <height>588</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,7 +61,7 @@
     <widget class="QPushButton" name="pushButton_Seleciona">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>200</x>
        <y>320</y>
        <width>16</width>
        <height>23</height>
@@ -77,9 +77,9 @@
     <widget class="QPushButton" name="pushButton_SelecionaTodos">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>220</x>
        <y>320</y>
-       <width>31</width>
+       <width>41</width>
        <height>23</height>
       </rect>
      </property>
@@ -111,7 +111,7 @@
       <rect>
        <x>300</x>
        <y>320</y>
-       <width>31</width>
+       <width>41</width>
        <height>23</height>
       </rect>
      </property>
@@ -132,7 +132,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Dados Disponíveis </string>
+      <string>Variáveis Disponíveis </string>
      </property>
     </widget>
     <widget class="QLabel" name="label_2">
@@ -140,12 +140,12 @@
       <rect>
        <x>10</x>
        <y>330</y>
-       <width>121</width>
+       <width>141</width>
        <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Dados Selecionados</string>
+      <string>Variáveis Selecionadas</string>
      </property>
     </widget>
     <widget class="QDialogButtonBox" name="button_box">
@@ -155,10 +155,15 @@
      <property name="geometry">
       <rect>
        <x>420</x>
-       <y>530</y>
+       <y>520</y>
        <width>121</width>
        <height>32</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -176,13 +181,18 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
     </widget>
     <widget class="QPushButton" name="pushButton_categoriza">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>180</x>
        <y>470</y>
-       <width>161</width>
+       <width>181</width>
        <height>23</height>
       </rect>
      </property>
@@ -194,7 +204,7 @@
      </property>
      <property name="font">
       <font>
-       <stylestrategy>PreferDefault</stylestrategy>
+       <pointsize>10</pointsize>
       </font>
      </property>
      <property name="toolTip">
@@ -213,11 +223,16 @@
     <widget class="QLabel" name="estadoLabel">
      <property name="geometry">
       <rect>
-       <x>11</x>
+       <x>0</x>
        <y>11</y>
-       <width>33</width>
+       <width>41</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Estado</string>
@@ -226,21 +241,31 @@
     <widget class="QComboBox" name="estadoComboBox">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>40</x>
        <y>11</y>
-       <width>69</width>
+       <width>141</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
     </widget>
     <widget class="QLabel" name="municPioOpcionalLabel">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>200</x>
        <y>10</y>
-       <width>93</width>
+       <width>111</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Município(opcional) </string>
@@ -249,21 +274,31 @@
     <widget class="QComboBox" name="municipioComboBox">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>320</x>
        <y>10</y>
-       <width>69</width>
+       <width>131</width>
        <height>20</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
     </widget>
     <widget class="QLabel" name="tabelaLabel">
      <property name="geometry">
       <rect>
-       <x>330</x>
-       <y>10</y>
-       <width>32</width>
+       <x>210</x>
+       <y>40</y>
+       <width>51</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Tabela</string>
@@ -275,9 +310,9 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>370</x>
-       <y>10</y>
-       <width>69</width>
+       <x>260</x>
+       <y>40</y>
+       <width>211</width>
        <height>20</height>
       </rect>
      </property>
@@ -286,6 +321,11 @@
        <width>16777215</width>
        <height>20</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="cursor">
       <cursorShape>ArrowCursor</cursorShape>
@@ -300,6 +340,11 @@
        <height>23</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="toolTip">
       <string>Abre um PDF oficial com explicações sobre os dados do Censo agregados por setor </string>
      </property>
@@ -312,9 +357,14 @@
       <rect>
        <x>10</x>
        <y>500</y>
-       <width>161</width>
+       <width>191</width>
        <height>16</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="text">
       <string>Carregar camadas adiconais </string>
@@ -329,6 +379,11 @@
        <height>16</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>(munícipio, distrito, subdistrito) </string>
      </property>
@@ -336,11 +391,16 @@
     <widget class="QPushButton" name="pushButton_divi">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>290</x>
        <y>500</y>
-       <width>61</width>
+       <width>71</width>
        <height>23</height>
       </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
      </property>
      <property name="toolTip">
       <string>Dividi os dados acima pelo os dados selecionados para categorização</string>
@@ -358,18 +418,23 @@
        <height>21</height>
       </rect>
      </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
     </widget>
-    <widget class="QScrollBar" name="horizontalScrollBar">
+    <widget class="QPushButton" name="pushButton_Manual">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>440</y>
-       <width>160</width>
-       <height>16</height>
+       <x>100</x>
+       <y>470</y>
+       <width>75</width>
+       <height>23</height>
       </rect>
      </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+     <property name="text">
+      <string>Manual</string>
      </property>
     </widget>
    </widget>
