@@ -39,7 +39,7 @@ import processing
 import subprocess
 import webbrowser
 
-lista_estados = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '33') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo - exceto capital':('SP_Exceto_a_Capital', '35') , 'São Paulo - Capital':('SP_Capital', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}		 
+lista_estados = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '31') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo - exceto capital':('SP_Exceto_a_Capital', '35') , 'São Paulo - Capital':('SP_Capital', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}		 
 lista_municipios = {}
 class DadosCenso:
     """QGIS Plugin Implementation."""
@@ -226,18 +226,11 @@ class DadosCenso:
                             os.remove(pasta+'/'+UF.lower()+item)        
 
         def baixa_dados(UF, pasta, estado):
-            if UF[:2] != 'SP' and UF != 'PE':
-                arquivo = '_20171016'
-            elif UF == 'PE':
-                arquivo = '_20200219'
-            elif estado == 'São Paulo - exceto capital':
-                arquivo = '_20190207'
-            elif estado == 'São Paulo - Capital':
-                arquivo = '_20190823'            
-                
-            caminho_planilha = '{0}/dados_IBGE/{1}/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, UF,  'Basico')        
+            arquivo = '_20231030'            
+            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, UF,  'Basico')        
             if not os.path.isfile(caminho_planilha):    
                 url= "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010/Resultados_do_Universo/Agregados_por_Setores_Censitarios/{0}{1}.zip".format(UF, arquivo)               
+                print(url)
                 download_file(url, pasta)   
                 with zipfile.ZipFile(pasta+'/'+UF+arquivo+'.zip', 'r') as zip_ref:
                     zip_ref.extractall(pasta)        
@@ -387,10 +380,11 @@ class DadosCenso:
             }
             outputs= processing.run('native:extractbyattribute', alg_params)
             layer_setores = outputs['OUTPUT']
-
+        print(dict_dados)
         #adiciona situacao e tipo
         if int(self.dlg.listBox_selecionados.count()) > 0:        
-            caminho_planilha = '{0}/dados_IBGE/{1}/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, estado,  'Basico')
+            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, estado,  'Basico')
+            print(caminho_planilha)
             layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
             #QgsProject.instance().addMapLayer(layer_planilha)
             alg_params = {
@@ -408,7 +402,7 @@ class DadosCenso:
             layer_setores = outputs['OUTPUT']        
 
             for planilha in dict_dados.keys():
-                caminho_planilha = '{0}/dados_IBGE/{1}/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, estado,  planilha)
+                caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, estado,  planilha)
                 layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
                 #QgsProject.instance().addMapLayer(layer_planilha)
                 alg_params = {
@@ -497,7 +491,7 @@ class DadosCenso:
             self.dlg.estadoComboBox.addItems(lista_estados.keys())
             path = os.path.join(
                     self.plugin_dir,
-                    'tabelas_dados.txt')            
+                    'tabelas_dados_censo_2010.txt')            
             file = open(path)
             contents = file.read()
             self.tabela_dados = ast.literal_eval(contents)
