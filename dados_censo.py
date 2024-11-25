@@ -39,7 +39,7 @@ import processing
 import subprocess
 import webbrowser
 
-lista_estados = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '31') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo - exceto capital':('SP_Exceto_a_Capital', '35') , 'São Paulo - Capital':('SP_Capital', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}		 
+lista_estados = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '31') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo - exceto capital':('SP_Exceto_Capital', '35') , 'São Paulo - Capital':('SP_Capital', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}		 
 lista_municipios = {}
 class DadosCenso:
     """QGIS Plugin Implementation."""
@@ -210,34 +210,36 @@ class DadosCenso:
             dict_arquivos = {'_distritos.zip':'DSE250GC_SIR.shp', '_municipios.zip':'MUE250GC_SIR.shp', '_subdistritos.zip':'SDE250GC_SIR.shp', '_setores_censitarios.zip':'SEE250GC_SIR.shp'}
             for item in dict_arquivos.keys():
                 if not os.path.isfile(pasta+'/'+UF_codigo+dict_arquivos[item]):  
-                    if UF == 'GO' and item == '_setores_censitarios.zip':
-                        url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/go/go_setores%20_censitarios.zip"
-                        download_file(url, pasta)
-                        with zipfile.ZipFile(pasta+'/'+UF.lower()+'_setores%20_censitarios.zip', 'r') as zip_ref:
-                            zip_ref.extractall(pasta)     
-                        os.remove(pasta+'/'+UF.lower()+'_setores%20_censitarios.zip')        
-                        
-                        
-                    else:    
-                            url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/{0}/{0}{1}".format(UF.lower(), item)
-                            download_file(url, pasta)
-                            with zipfile.ZipFile(pasta+'/'+UF.lower()+item, 'r') as zip_ref:
-                                zip_ref.extractall(pasta)     
-                            os.remove(pasta+'/'+UF.lower()+item)        
+                    print(pasta+'/'+UF_codigo+dict_arquivos[item])
+                    url= u"https://geoftp.ibge.gov.br/organizacao_do_territorio/malhas_territoriais/malhas_de_setores_censitarios__divisoes_intramunicipais/censo_2010/setores_censitarios_shp/{0}/{0}{1}".format(UF.lower(), item)
+                    print(url)
+                    download_file(url, pasta)
+                    with zipfile.ZipFile(pasta+'/'+UF.lower()+item, 'r') as zip_ref:
+                        zip_ref.extractall(pasta)     
+                    os.remove(pasta+'/'+UF.lower()+item)        
 
-        def baixa_dados(UF, pasta, estado):
+        def baixa_dados(UF, pasta, estado):   
+            if 'Exceto_Capital'  in UF:
+                UF2 = 'SP2'
+            elif 'Capital'  in UF:
+                UF2 = 'SP1'
+            else:
+                UF2 = UF
+            print('UF2', UF2)
             arquivo = '_20231030'            
-            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, UF,  'Basico')        
+            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{3}.csv'.format(self.plugin_dir, UF,  'Basico', UF2)        
+            print(caminho_planilha)
             if not os.path.isfile(caminho_planilha):    
                 url= "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2010/Resultados_do_Universo/Agregados_por_Setores_Censitarios/{0}{1}.zip".format(UF, arquivo)               
                 print(url)
                 download_file(url, pasta)   
+                #print(pasta+'/'+UF+arquivo+'.zip')
                 with zipfile.ZipFile(pasta+'/'+UF+arquivo+'.zip', 'r') as zip_ref:
                     zip_ref.extractall(pasta)        
                 os.remove(pasta+'/'+UF+arquivo+'.zip') 
                 
         def arruma_pastas(UF, pasta, estado):
-            caminho_planilha = '{0}/dados_IBGE/{1}/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, UF,  'Basico')        
+            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, UF,  'Basico')        
             if not os.path.isfile(caminho_planilha):          
                 if UF == 'ES' or UF == 'TO' or UF == 'SP_Capital':
                     if UF == 'TO':
@@ -245,7 +247,7 @@ class DadosCenso:
                     arquivo = 'Base informaçoes setores2010 universo '+ UF
                     shutil.move((pasta+"/"+arquivo), (pasta+'/'+UF+'/'+arquivo)) 
                     
-                elif UF == 'PE':
+                if UF == 'SP_Capital':
                     arquivo = 'PE_20171016'
                     shutil.move((pasta+"/"+arquivo+"/"+UF), (pasta+"/"+UF)) 
                     os.rmdir(pasta+"/"+arquivo)    
@@ -255,13 +257,13 @@ class DadosCenso:
                     shutil.move((pasta+"/"+arquivo+"/"+UF), (pasta+"/"+UF))
                     os.rmdir(pasta+"/"+arquivo) 
                     
-                elif UF == 'SP_Exceto_a_Capital':
-                    arquivo = 'SP Exceto a Capital'
+                elif UF == 'SP_Exceto_Capital':
+                    arquivo = 'SP Exceto Capital'
                     shutil.move((pasta+"/"+arquivo), (pasta+"/"+UF))
                     #os.rmdir(pasta+"/"+arquivo) 
                     os.rename(pasta+"/"+UF+"/Base informaçoes setores2010 universo SP_Exceto_Capital", pasta+"/"+UF+"/Base informaçoes setores2010 universo "+UF)
                     
-                if UF == 'SP_Capital' or UF == 'SP_Exceto_a_Capital':
+                if UF == 'SP_Capital' or UF == 'SP_Exceto_Capital':
                     pasta_alvo = pasta+"/"+UF+"/Base informaçoes setores2010 universo "+UF+"/"+"CSV"
                     for filename in os.listdir(pasta_alvo):
                         if 'SP' in filename:
@@ -292,7 +294,7 @@ class DadosCenso:
             baixa_setores(UF[:2], UF_codigo, pasta)
             baixa_dados(UF, pasta, estado)
             self.iface.messageBar().clearWidgets()
-            arruma_pastas(UF, pasta, estado)
+            #arruma_pastas(UF, pasta, estado)
         else:
             self.iface.messageBar().pushMessage("Não foi possível acessar a url:" +url, Qgis.Critical)         
         
@@ -382,8 +384,15 @@ class DadosCenso:
             layer_setores = outputs['OUTPUT']
         print(dict_dados)
         #adiciona situacao e tipo
-        if int(self.dlg.listBox_selecionados.count()) > 0:        
-            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, estado,  'Basico')
+        if int(self.dlg.listBox_selecionados.count()) > 0:   
+            if 'SP' not in estado:
+                estado2 = estado     
+            elif 'SP_Capital'  in estado:
+                estado2 = 'SP1'
+            elif 'SP_Exceto_Capital'  in estado:
+                estado2 = 'SP2'
+                 
+            caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{3}.csv'.format(self.plugin_dir, estado,  'Basico', estado2)
             print(caminho_planilha)
             layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
             #QgsProject.instance().addMapLayer(layer_planilha)
@@ -402,7 +411,12 @@ class DadosCenso:
             layer_setores = outputs['OUTPUT']        
 
             for planilha in dict_dados.keys():
-                caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{1}.csv'.format(self.plugin_dir, estado,  planilha)
+                caminho_planilha = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{3}.csv'.format(self.plugin_dir, estado,  planilha, estado2)
+                #ve se uf está minúscula
+                caminho_planilha_mi = '{0}/dados_IBGE/Base informaçoes setores2010 universo {1}/CSV/{2}_{3}.csv'.format(self.plugin_dir, estado,  planilha, estado2.lower())
+                if  os.path.isfile(caminho_planilha_mi):
+                    caminho_planilha = caminho_planilha_mi
+                print(caminho_planilha)    
                 layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
                 #QgsProject.instance().addMapLayer(layer_planilha)
                 alg_params = {
