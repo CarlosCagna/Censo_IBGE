@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>552</width>
-    <height>588</height>
+    <width>628</width>
+    <height>621</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,15 +16,355 @@
   <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>0</y>
-     <width>581</width>
-     <height>581</height>
+     <width>611</width>
+     <height>571</height>
     </rect>
    </property>
    <property name="currentIndex">
     <number>0</number>
    </property>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Censo 2022</string>
+    </attribute>
+    <widget class="QPushButton" name="pushButton_categoriza_22">
+     <property name="geometry">
+      <rect>
+       <x>200</x>
+       <y>470</y>
+       <width>181</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Categoriza os setores com a soma dos dados selecionados</string>
+     </property>
+     <property name="text">
+      <string>Categorizar: soma dos dados</string>
+     </property>
+     <property name="default">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="tabelaComboBox_22">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>280</x>
+       <y>40</y>
+       <width>211</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="cursor">
+      <cursorShape>ArrowCursor</cursorShape>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_SelecionaTodos_22">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>320</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Move todas linhas</string>
+     </property>
+     <property name="text">
+      <string>&gt;&gt;&gt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="tabelaLabel_22">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>40</y>
+       <width>51</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Tabela</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_Doc_22">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>470</y>
+       <width>101</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Abre um PDF oficial com explicações sobre os dados do Censo agregados por setor </string>
+     </property>
+     <property name="text">
+      <string>Documentação</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_Seleciona_22">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>320</y>
+       <width>16</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Move as linhas selecionadas </string>
+     </property>
+     <property name="text">
+      <string>&gt;</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_RetiraTodos_22">
+     <property name="geometry">
+      <rect>
+       <x>320</x>
+       <y>320</y>
+       <width>41</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Retorna todas linhas</string>
+     </property>
+     <property name="text">
+      <string>&lt;&lt;&lt;</string>
+     </property>
+    </widget>
+    <widget class="QListWidget" name="listBox_disponiveis_22">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>70</y>
+       <width>551</width>
+       <height>241</height>
+      </rect>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="estadoComboBox_22">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>11</y>
+       <width>141</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QLabel" name="estadoLabel_22">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>11</y>
+       <width>41</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Estado</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="municipioComboBox_22">
+     <property name="geometry">
+      <rect>
+       <x>340</x>
+       <y>10</y>
+       <width>131</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="textBrowser_soma_22">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>470</y>
+       <width>171</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QListWidget" name="listBox_selecionados_22">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>350</y>
+       <width>551</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_divi_22">
+     <property name="geometry">
+      <rect>
+       <x>310</x>
+       <y>500</y>
+       <width>71</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Dividi os dados acima pelo os dados selecionados para categorização</string>
+     </property>
+     <property name="text">
+      <string>Dividir por</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_23">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>330</y>
+       <width>141</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Variáveis Selecionadas</string>
+     </property>
+    </widget>
+    <widget class="QTextBrowser" name="textBrowser_divi_22">
+     <property name="geometry">
+      <rect>
+       <x>390</x>
+       <y>500</y>
+       <width>171</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+      </font>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton_Retira_22">
+     <property name="geometry">
+      <rect>
+       <x>300</x>
+       <y>320</y>
+       <width>16</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="toolTip">
+      <string>Retorna as linhas selecionadas </string>
+     </property>
+     <property name="text">
+      <string>&lt;</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_24">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>131</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Variáveis Disponíveis </string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="municPioOpcionalLabel_22">
+     <property name="geometry">
+      <rect>
+       <x>220</x>
+       <y>10</y>
+       <width>111</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Município(opcional) </string>
+     </property>
+    </widget>
+   </widget>
    <widget class="QWidget" name="tab">
     <attribute name="title">
      <string>Censo 2010</string>
@@ -35,7 +375,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>20</x>
        <y>70</y>
        <width>551</width>
        <height>241</height>
@@ -48,7 +388,7 @@
     <widget class="QListWidget" name="listBox_selecionados">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>20</x>
        <y>350</y>
        <width>551</width>
        <height>111</height>
@@ -61,7 +401,7 @@
     <widget class="QPushButton" name="pushButton_Seleciona">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>220</x>
        <y>320</y>
        <width>16</width>
        <height>23</height>
@@ -77,7 +417,7 @@
     <widget class="QPushButton" name="pushButton_SelecionaTodos">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>240</x>
        <y>320</y>
        <width>41</width>
        <height>23</height>
@@ -93,7 +433,7 @@
     <widget class="QPushButton" name="pushButton_Retira">
      <property name="geometry">
       <rect>
-       <x>280</x>
+       <x>300</x>
        <y>320</y>
        <width>16</width>
        <height>23</height>
@@ -109,7 +449,7 @@
     <widget class="QPushButton" name="pushButton_RetiraTodos">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>320</x>
        <y>320</y>
        <width>41</width>
        <height>23</height>
@@ -125,7 +465,7 @@
     <widget class="QLabel" name="label">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
        <y>40</y>
        <width>131</width>
        <height>16</height>
@@ -138,7 +478,7 @@
     <widget class="QLabel" name="label_2">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
        <y>330</y>
        <width>141</width>
        <height>16</height>
@@ -148,34 +488,10 @@
       <string>Variáveis Selecionadas</string>
      </property>
     </widget>
-    <widget class="QDialogButtonBox" name="button_box">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="geometry">
-      <rect>
-       <x>420</x>
-       <y>520</y>
-       <width>121</width>
-       <height>32</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
     <widget class="QTextBrowser" name="textBrowser_soma">
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>390</x>
        <y>470</y>
        <width>171</width>
        <height>21</height>
@@ -190,7 +506,7 @@
     <widget class="QPushButton" name="pushButton_categoriza">
      <property name="geometry">
       <rect>
-       <x>180</x>
+       <x>200</x>
        <y>470</y>
        <width>181</width>
        <height>23</height>
@@ -223,7 +539,7 @@
     <widget class="QLabel" name="estadoLabel">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>20</x>
        <y>11</y>
        <width>41</width>
        <height>16</height>
@@ -241,7 +557,7 @@
     <widget class="QComboBox" name="estadoComboBox">
      <property name="geometry">
       <rect>
-       <x>40</x>
+       <x>60</x>
        <y>11</y>
        <width>141</width>
        <height>20</height>
@@ -256,7 +572,7 @@
     <widget class="QLabel" name="municPioOpcionalLabel">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>220</x>
        <y>10</y>
        <width>111</width>
        <height>16</height>
@@ -274,7 +590,7 @@
     <widget class="QComboBox" name="municipioComboBox">
      <property name="geometry">
       <rect>
-       <x>320</x>
+       <x>340</x>
        <y>10</y>
        <width>131</width>
        <height>20</height>
@@ -289,7 +605,7 @@
     <widget class="QLabel" name="tabelaLabel">
      <property name="geometry">
       <rect>
-       <x>210</x>
+       <x>230</x>
        <y>40</y>
        <width>51</width>
        <height>16</height>
@@ -310,7 +626,7 @@
      </property>
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>280</x>
        <y>40</y>
        <width>211</width>
        <height>20</height>
@@ -334,9 +650,9 @@
     <widget class="QPushButton" name="pushButton_Doc">
      <property name="geometry">
       <rect>
-       <x>0</x>
+       <x>20</x>
        <y>470</y>
-       <width>91</width>
+       <width>101</width>
        <height>23</height>
       </rect>
      </property>
@@ -355,7 +671,7 @@
     <widget class="QCheckBox" name="checkBox_camadas">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
        <y>500</y>
        <width>191</width>
        <height>16</height>
@@ -373,7 +689,7 @@
     <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>30</x>
        <y>520</y>
        <width>201</width>
        <height>16</height>
@@ -391,7 +707,7 @@
     <widget class="QPushButton" name="pushButton_divi">
      <property name="geometry">
       <rect>
-       <x>290</x>
+       <x>310</x>
        <y>500</y>
        <width>71</width>
        <height>23</height>
@@ -412,7 +728,7 @@
     <widget class="QTextBrowser" name="textBrowser_divi">
      <property name="geometry">
       <rect>
-       <x>370</x>
+       <x>390</x>
        <y>500</y>
        <width>171</width>
        <height>21</height>
@@ -424,52 +740,53 @@
       </font>
      </property>
     </widget>
-    <widget class="QPushButton" name="pushButton_Manual">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>470</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Manual</string>
-     </property>
-    </widget>
    </widget>
-   <widget class="QWidget" name="tab_2">
-    <attribute name="title">
-     <string>Censo 2000</string>
-    </attribute>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>20</x>
-       <y>10</y>
-       <width>221</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Em desenvolvimento</string>
-     </property>
-    </widget>
-   </widget>
+  </widget>
+  <widget class="QDialogButtonBox" name="button_box">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>570</y>
+     <width>131</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_Manual">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>580</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Manual</string>
+   </property>
   </widget>
  </widget>
  <resources/>
  <connections>
   <connection>
    <sender>button_box</sender>
-   <signal>rejected()</signal>
+   <signal>accepted()</signal>
    <receiver>DadosCensoDialogBase</receiver>
-   <slot>reject()</slot>
+   <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>20</x>
@@ -483,9 +800,9 @@
   </connection>
   <connection>
    <sender>button_box</sender>
-   <signal>accepted()</signal>
+   <signal>rejected()</signal>
    <receiver>DadosCensoDialogBase</receiver>
-   <slot>accept()</slot>
+   <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>20</x>

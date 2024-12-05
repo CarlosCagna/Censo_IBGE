@@ -38,8 +38,10 @@ import ast
 import processing
 import subprocess
 import webbrowser
+import unicodedata
 
 lista_estados = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '31') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo - exceto capital':('SP_Exceto_Capital', '35') , 'São Paulo - Capital':('SP_Capital', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}		 
+lista_estados_22 = {'':'','Acre':('AC', '12') , 'Alagoas':('AL','27')  , 'Amapá':('AP', '16') , 'Amazonas':('AM', '13') , 'Bahia':('BA', '29') , 'Ceará':('CE', '23') , 'Espírito Santo':('ES', '32'), 'Distrito Federal':('DF', '53'), 'Goiás':('GO', '52'), 'Maranhão':('MA', '21') , 'Mato Grosso':('MT', '51') , 'Mato Grosso do Sul':('MS', '50') , 'Minas Gerais':('MG', '31') , 'Pará':('PA', '15') , 'Paraíba':('PB', '25') , 'Paraná':('PR', '41') , 'Pernambuco':('PE', '26') , 'Piauí':('PI', '22') , 'Rio de Janeiro':('RJ', '33') , 'Rio Grande do Norte':('RN', '24') , 'Rio Grande do Sul':('RS', '43') , 'Rondônia':('RO', '11') , 'Roraima':('RR', '14') , 'Santa Catarina':('SC', '42') , 'São Paulo':('SP', '35'),'Sergipe':('SE', '28') , 'Tocantins':('TO', '17')}
 lista_municipios = {}
 class DadosCenso:
     """QGIS Plugin Implementation."""
@@ -194,7 +196,254 @@ class DadosCenso:
         self.dlg.listBox_selecionados.clear() 
         self.dlg.textBrowser_soma.clear() 
         self.dlg.textBrowser_divi.clear() 
+        self.dlg.tabelaComboBox_22.setCurrentIndex(0) 
+        self.dlg.listBox_disponiveis_22.clear() 
+        self.dlg.listBox_selecionados_22.clear() 
+        self.dlg.textBrowser_soma_22.clear() 
+        self.dlg.textBrowser_divi_22.clear()
+         
+    def muda_para_float_altera_nome(self, layer, dic_value_name, censo):
+        layer.startEditing()
+        
+        for feat in layer.getFeatures():
+            for field in layer.fields():
+                if (feat[field.name()]) == 'X':
+                    layer.changeAttributeValue(feat.id(), layer.fields().indexOf(field.name()), None)
 
+        # Obter os campos da camada
+        fields = layer.fields()
+
+        # Criar uma nova definição de campos para o mapeamento
+        fields_mapping = []
+
+        for field in fields:
+            if 'V' in field.name() and field.typeName() == 'string':
+                # Alterar campos que começam com 'v_' e são do tipo string para double
+                fields_mapping.append({
+                    'name': field.name(),       # Nome do campo
+                    'type': 6,                  # Tipo 6 = Double
+                    'expression': f'"{field.name()}"',  # Mantém os valores atuais
+                    'length': 10,               # Comprimento opcional (só para compatibilidade, não obrigatório para double)
+                    'precision': 3              # Precisão decimal para double
+                })
+            else:
+                # Manter os outros campos inalterados
+                fields_mapping.append({
+                    'name': field.name().replace('v0', 'V0'),
+                    'type': field.type(),       # Tipo original
+                    'expression': f'"{field.name()}"',  # Mantém os valores atuais
+                    'length': field.length(),   # Comprimento original
+                    'precision': field.precision() if field.typeName() in ['Double', 'Real'] else 0  # Precisão, se aplicável
+                })
+
+        # Configurar os parâmetros para o algoritmo 'native:refactorfields'
+        params = {
+            'INPUT': layer,
+            'FIELDS_MAPPING': fields_mapping,
+            'OUTPUT': 'memory:'  # Resultado em memória
+        }
+
+        # Executar o algoritmo
+        result = processing.run('native:refactorfields', params)
+
+        # Adicionar a nova camada ao projeto
+        refactored_layer = result['OUTPUT']
+
+
+        #renomeia 
+
+        for field in refactored_layer.fields():
+            newFieldName = ''
+            fieldName = field.name()
+            if censo == 2022:
+                if fieldName in dic_value_name.keys():
+                    newFieldName = fieldName + '_' + dic_value_name[fieldName]
+            if censo == 2010:
+                if fieldName.replace('_V', '_v') in dic_value_name.keys():
+                    newFieldName = fieldName + '_' + dic_value_name[fieldName.replace('_V', '_v')]
+            
+            if newFieldName != '':
+                refactored_layer.setFieldAlias(refactored_layer.fields().indexOf(fieldName), newFieldName)
+
+        return refactored_layer
+
+    def baixa_dados_estado_22(self, UF, UF_codigo, estado):
+        def download_file(url, folder_name):
+            local_filename = url.split('/')[-1]
+            path = os.path.join("{}/{}".format(folder_name, local_filename))
+            with requests.get(url, stream=True, verify=False) as r:
+                with open(path, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+            progress.setValue(self.i + 1)
+            self.i = self.i + 1
+            return local_filename
+
+        def baixa_setores(UF, UF_codigo, pasta):
+            url = f'https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/malha_com_atributos/setores/gpkg/UF/{UF}/{UF}_setores_CD2022.gpkg'
+            print(url)
+            download_file(url, pasta)
+
+        arquivo_setor = self.plugin_dir+'/dados_IBGE/'+UF+'_setores_CD2022.gpkg'
+        print(arquivo_setor)
+        if not os.path.isfile(arquivo_setor):
+            
+            url = 'https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/malha_com_atributos/setores/gpkg/UF'
+            conexao = ''
+            try:
+                response = requests.get(url, verify=False)
+                conexao = True
+            except requests.ConnectionError as exception:
+                print (exception)
+                conexao = False
+                
+            if conexao == True:
+        
+                progressMessageBar = self.iface.messageBar().createMessage("Baixando dados do Estado...")
+                progress = QProgressBar()
+                progress.setMaximum(5)
+                progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+                progressMessageBar.layout().addWidget(progress)
+                self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+                self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+                self.i = 0
+                pasta = self.plugin_dir+'/dados_IBGE'
+                baixa_setores(UF[:2], UF_codigo, pasta)
+                #baixa_dados(UF, pasta, estado)
+                self.iface.messageBar().clearWidgets()
+                #arruma_pastas(UF, pasta, estado)
+            else:
+                self.iface.messageBar().pushMessage("Não foi possível acessar a url:" +url, Qgis.Critical)         
+    
+    def popula_municipios_22(self, codigo_UF, estado):
+        self.dlg.municipioComboBox_22.clear()
+
+        self.layer_setores_22 = QgsVectorLayer(self.plugin_dir+'/dados_IBGE/'+estado+'_setores_CD2022.gpkg', "municipios_22", "ogr")
+        print(self.plugin_dir+'/dados_IBGE/'+estado+'_setores_CD2022.gpkg')
+        self.dic_municipios_22 = {'':''}
+
+        for setor in self.layer_setores_22.getFeatures():
+            if setor['NM_MUN'] not in self.dic_municipios_22.keys():
+                self.dic_municipios_22[setor['NM_MUN']] = setor['CD_MUN']
+        list_mun = list(self.dic_municipios_22.keys())
+        list_mun.sort()
+        print(list_mun)
+        self.dlg.municipioComboBox_22.addItems(list_mun)
+
+    def popula_dados_22(self, descr_tabela):
+        self.dlg.listBox_disponiveis_22.clear()
+        #tabela = self.dict_lista_tabela[self.dlg.tabelaComboBox.currentText()]   
+        sum_list = []
+        for key, values in  self.tabela_dados_22.items():
+            if key == descr_tabela:
+                for var in values:
+                    sum_list.append(var[0]+': '+var[1] +': '+ key)
+        self.dlg.listBox_disponiveis_22.addItems(sum_list)
+
+    def baixa_tabelas_22(self, tabela):
+        def download_file(url, folder_name):
+            local_filename = url.split('/')[-1]
+            path = os.path.join("{}/{}".format(folder_name, local_filename))
+            with requests.get(url, stream=True, verify=False) as r:
+                with open(path, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+            progress.setValue(self.i + 1)
+            self.i = self.i + 1
+            return local_filename
+        pasta = self.plugin_dir+'/dados_IBGE'
+        arquivo_tabela = self.plugin_dir+f'/dados_IBGE/Agregados_por_setores_{tabela}_BR.csv'
+        if not os.path.isfile(arquivo_tabela):
+            url = f'https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/Agregados_por_Setor_csv/Agregados_por_setores_{tabela}_BR.zip'
+            print(url)
+            conexao = ''
+            try:
+                response = requests.get(url, verify=False)
+                conexao = True
+            except requests.ConnectionError as exception:
+                print (exception)
+                conexao = False
+                
+            if conexao == True:
+        
+                progressMessageBar = self.iface.messageBar().createMessage("Baixando dados...")
+                progress = QProgressBar()
+                progress.setMaximum(5)
+                progress.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
+                progressMessageBar.layout().addWidget(progress)
+                self.iface.messageBar().pushWidget(progressMessageBar, Qgis.Info)
+                self.i = 0
+                self.iface.mapCanvas().refresh()
+                import time
+                time.sleep(5)
+                download_file(url, pasta)   
+                #print(pasta+'/'+UF+arquivo+'.zip')
+                arquivo_tabela_zip = arquivo_tabela.replace('.csv', '.zip')
+                with zipfile.ZipFile(arquivo_tabela_zip, 'r') as zip_ref:
+                    zip_ref.extractall(pasta)        
+                os.remove(arquivo_tabela_zip) 
+                #baixa_dados(UF, pasta, estado)
+                self.iface.messageBar().clearWidgets()
+                #arruma_pastas(UF, pasta, estado)
+            else:
+                self.iface.messageBar().pushMessage("Não foi possível acessar a url:" +url, Qgis.Critical)         
+            
+    def seleciona_categoriza_22(self):
+        lista_categoriza_22 = self.dlg.listBox_selecionados_22.selectedItems()
+        texto = ''
+        for x in lista_categoriza_22:
+            if texto == '':
+                texto =  texto + x.text().split(':')[0]
+            else:
+                texto =  texto + '+' + x.text().split(':')[0]
+        self.dlg.textBrowser_soma_22.setText(texto)
+
+    def seleciona_divide_22(self):
+        lista_divide_22 = self.dlg.listBox_selecionados_22.selectedItems()
+        texto = ''
+        for x in lista_divide_22:
+            if texto == '':
+                texto =  texto + x.text().split(':')[0]
+            else:
+                texto =  texto + '+' + x.text().split(':')[0]
+        self.dlg.textBrowser_divi_22.setText(texto)    
+                  
+    def uni_setor_atributos_22(self, dict_dados, layer_setores):
+        for planilha, variaveis in dict_dados.items():
+            if planilha != 'Básico':
+                print('variaveis', variaveis)
+                print('variaveis')
+                planilha = unicodedata.normalize('NFKD', planilha).encode('ASCII', 'ignore').decode('ASCII').lower()
+                planilha = planilha.replace(' - parte ', '')
+                planilha = planilha.replace(' do ', ' ')
+                planilha = planilha.replace(' ', '_')
+                print(planilha)
+                caminho_planilha = f'{self.plugin_dir}/dados_IBGE/Agregados_por_setores_{planilha}_BR.csv'
+                print(caminho_planilha)
+                layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
+                
+                #QgsProject.instance().addMapLayer(layer_planilha)
+                alg_params = {
+                    'DISCARD_NONMATCHING': False,
+                    'FIELD': 'CD_SETOR',
+                    'FIELDS_TO_COPY':variaveis,
+                    'FIELD_2': 'CD_setor',
+                    'INPUT': layer_setores,
+                    'INPUT_2': layer_planilha,
+                    'METHOD': 1,
+                    'PREFIX': '',
+                    'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                }
+                outputs = processing.run('native:joinattributestable', alg_params)
+                layer_setores = outputs['OUTPUT']
+            
+                #setores_municipio = outputs['ExtrairPorAtributo']['OUTPUT']
+            
+        #QgsProject.instance().addMapLayer(layer_setores)
+        return layer_setores
+
+    def abre_doc_22(self):
+        path =  'file:///'+self.plugin_dir+u'/Agregados por Setores Censitários 22.pdf'
+        webbrowser.open_new_tab(path)
+ 
     def baixa_dados_estado(self, UF, UF_codigo, estado):
         def download_file(url, folder_name):
             local_filename = url.split('/')[-1]
@@ -382,7 +631,6 @@ class DadosCenso:
             }
             outputs= processing.run('native:extractbyattribute', alg_params)
             layer_setores = outputs['OUTPUT']
-        print(dict_dados)
         #adiciona situacao e tipo
         if int(self.dlg.listBox_selecionados.count()) > 0:   
             if 'SP' not in estado:
@@ -399,12 +647,12 @@ class DadosCenso:
             alg_params = {
                 'DISCARD_NONMATCHING': False,
                 'FIELD': 'CD_GEOCODI',
-                'FIELDS_TO_COPY': ['Situacao_setor','Tipo_setor'] ,
+                'FIELDS_TO_COPY': ['Situacao_setor'] ,
                 'FIELD_2': 'Cod_setor',
                 'INPUT': layer_setores,
                 'INPUT_2': layer_planilha,
                 'METHOD': 1,
-                'PREFIX': '_',
+                'PREFIX': '',
                 'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
             }
             outputs = processing.run('native:joinattributestable', alg_params)
@@ -419,6 +667,7 @@ class DadosCenso:
                 print(caminho_planilha)    
                 layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
                 #QgsProject.instance().addMapLayer(layer_planilha)
+                print('bbbbbb', dict_dados[planilha])
                 alg_params = {
                     'DISCARD_NONMATCHING': False,
                     'FIELD': 'CD_GEOCODI',
@@ -435,33 +684,59 @@ class DadosCenso:
             
                 #setores_municipio = outputs['ExtrairPorAtributo']['OUTPUT']
             
+        
+        
+        dic_value_name = {}
+        for planilha, list in self.tabela_dados.items():
+            for variavel, descr in list[1].items():
+                dic_value_name[planilha + '_' + variavel.replace('V', 'v')] = descr
+        
+        layer_setores = self.muda_para_float_altera_nome(layer_setores, dic_value_name, 2010)
         QgsProject.instance().addMapLayer(layer_setores)
-        layer_setores.setName('Setores_censitários')
+        
+        layer_setores.setName('Setores_censitários_2010')
         layer_setores.loadNamedStyle(self.plugin_dir+'/estilos_camadas/setores.qml')  
         layer_setores.triggerRepaint()   
+        print(dic_value_name)
         if self.dlg.textBrowser_soma.toPlainText() != '':
             lista_cat = []
-            items = self.lista_categoriza    
+            items = self.lista_categoriza       
             nome = 'Categoria'
             for i in items:
-                lista_cat.append(i.text().split(':')[2][1:]+'_'+i.text().split(':')[0])
+
+                i = i.text().split(':')[2][1:]+'_'+i.text().split(':')[0]
+                print(i)
+                lista_cat.append(i)
                 
             field = QgsField( nome, QVariant.Double )
             expr = ''
+            y = 0
             for x in lista_cat:
-                expr = expr+'to_real(replace("'+ x + """", ',', '.')) + """
+                if y == 0:
+                    expr = expr + f'"{x}"'
+                else:
+                    expr = expr + f'+"{x}"'
+                y = y +1  
+
 
             if self.dlg.textBrowser_divi.toPlainText() != '':
                 items = self.lista_divide
+                print(items)
                 lista_div = []
                 for i in items:
-                    lista_div.append(i.text().split(':')[2][1:]+'_'+i.text().split(':')[0])
-                expr = '('+ expr[:-3] + ')/('    
+                    i = i.text().split(':')[2][1:]+'_'+i.text().split(':')[0]
+                    lista_div.append(i)
+                expr = '('+ expr +')/('
+                y = 0    
                 for x in lista_div:
-                    expr = expr+'to_real(replace("'+ x + """", ',', '.')) + """                
-                expr = expr[:-3] + ')'
-            else:
-                 expr = expr[:-3]
+                    if y == 0:
+                        expr = expr + f'"{x}"'
+                    else:
+                        expr = expr + f'+"{x}"'
+                    y = y +1                      
+     
+                expr =  expr + ')'
+                 
             layer_setores.addExpressionField(expr, field )
             renderer = QgsGraduatedSymbolRenderer() 
             renderer.setClassAttribute('Categoria') 
@@ -502,6 +777,7 @@ class DadosCenso:
         if self.first_start == True:
             self.first_start = False
             self.dlg = DadosCensoDialog()
+            #adiciona censo 2010
             self.dlg.estadoComboBox.addItems(lista_estados.keys())
             path = os.path.join(
                     self.plugin_dir,
@@ -518,6 +794,24 @@ class DadosCenso:
                 #self.dict_lista_tabela[value] = key
             lista_tabelas.insert(0, '')
             self.dlg.tabelaComboBox.addItems(lista_tabelas)
+            
+            #adiciona censo 2022
+            self.dlg.estadoComboBox_22.addItems(lista_estados_22.keys())
+            path = os.path.join(
+                    self.plugin_dir,
+                    'tabelas_dados_censo_2022.txt')            
+            file = open(path)
+            contents = file.read()
+            self.tabela_dados_22 = ast.literal_eval(contents)
+            lista_tabelas = []
+            self.lista_selecionados_22 = []
+            #self.dict_lista_tabela = {}
+            for key in self.tabela_dados_22.keys():
+                lista_tabelas.append(key)
+            lista_tabelas.insert(0, '')
+            self.dlg.tabelaComboBox_22.addItems(lista_tabelas)
+            
+            
         
         # show the dialog
         self.limpa_dados()
@@ -533,21 +827,123 @@ class DadosCenso:
         self.dlg.pushButton_divi.clicked.connect(lambda:self.seleciona_divide())
         self.dlg.pushButton_Doc.clicked.connect(lambda:self.abre_doc())
         self.dlg.pushButton_Manual.clicked.connect(lambda:self.abre_manual())
-
-
-
+        
+        #censo 2022
+        self.dlg.estadoComboBox_22.currentIndexChanged.connect(lambda: self.baixa_dados_estado_22(lista_estados_22[self.dlg.estadoComboBox_22.currentText()][0], lista_estados_22[self.dlg.estadoComboBox_22.currentText()][1], self.dlg.estadoComboBox_22.currentText())) 
+        self.dlg.estadoComboBox_22.currentIndexChanged.connect(lambda: self.popula_municipios_22(lista_estados_22[self.dlg.estadoComboBox_22.currentText()][1], lista_estados_22[self.dlg.estadoComboBox_22.currentText()][0]))
+        self.dlg.tabelaComboBox_22.currentIndexChanged.connect(lambda: self.popula_dados_22(self.dlg.tabelaComboBox_22.currentText()))
+        self.dlg.pushButton_Seleciona_22.clicked.connect(lambda:self.movimenta_item(self.dlg.listBox_disponiveis_22, self.dlg.listBox_selecionados_22))
+        self.dlg.pushButton_SelecionaTodos_22.clicked.connect(lambda:self.movimenta_item(self.dlg.listBox_disponiveis_22, self.dlg.listBox_selecionados_22, True))
+        self.dlg.pushButton_Retira_22.clicked.connect(lambda:self.movimenta_item(self.dlg.listBox_selecionados_22, self.dlg.listBox_disponiveis_22))
+        self.dlg.pushButton_RetiraTodos_22.clicked.connect(lambda:self.movimenta_item(self.dlg.listBox_selecionados_22, self.dlg.listBox_disponiveis_22, True)) 
+        self.dlg.pushButton_categoriza_22.clicked.connect(lambda:self.seleciona_categoriza_22())  
+        self.dlg.pushButton_divi_22.clicked.connect(lambda:self.seleciona_divide_22())
+        self.dlg.pushButton_Doc_22.clicked.connect(lambda:self.abre_doc_22())
         # Run the dialog event loop
         result = self.dlg.exec_()
-        # See if OK was pressed
+        # See if OK was presseds
         if result:
-            # Do something useful here - delete the line containing pass and
-            # substitute with your code.
-            estado = lista_estados[self.dlg.estadoComboBox.currentText()][0]
-            codigo_estado = lista_estados[self.dlg.estadoComboBox.currentText()][1]
-            municipio =  self.lista_municipios[self.dlg.municipioComboBox.currentText()]
-            self.uni_setor_atributos(self.dlg.listBox_selecionados, estado, codigo_estado, municipio)
-            if self.dlg.checkBox_camadas.isChecked():
-                self.carrega_demais_camadas(estado, codigo_estado[:2], municipio)                        
-
             
+            # Censo 2010
+            if self.dlg.estadoComboBox.currentText() !='':
+                estado = lista_estados[self.dlg.estadoComboBox.currentText()][0]
+                codigo_estado = lista_estados[self.dlg.estadoComboBox.currentText()][1]
+                municipio =  self.lista_municipios[self.dlg.municipioComboBox.currentText()]
+                self.uni_setor_atributos(self.dlg.listBox_selecionados, estado, codigo_estado, municipio)
+                
+                if self.dlg.checkBox_camadas.isChecked():
+                    self.carrega_demais_camadas(estado, codigo_estado[:2], municipio)                        
+            # Censo 2022
+            if self.dlg.estadoComboBox_22.currentText() !='':
+                variaveis_seleionados = []
+                dict_dados = {}
+                lst = self.dlg.listBox_selecionados_22
+                items = []
+                for x in range(lst.count()):
+                    items.append(lst.item(x).text())
+                    planilha = lst.item(x).text().split(':')[2][1:]
+                    coluna = lst.item(x).text().split(':')[0]        
+                    if planilha not in dict_dados.keys():
+                        dict_dados[planilha] = [coluna]
+                    else:
+                        dict_dados[planilha].append(coluna)
+                #print(dict_dados)
+                for planilha in dict_dados.keys():
+                    planilha = unicodedata.normalize('NFKD', planilha).encode('ASCII', 'ignore').decode('ASCII').lower()
+                    planilha = planilha.replace(' - parte ', '')
+                    planilha = planilha.replace(' do ', ' ')
+                    planilha = planilha.replace(' ', '_')
+                    self.baixa_tabelas_22(planilha)
+                    
+                municipio = self.dlg.municipioComboBox_22.currentText()
+                cod_mun = self.dic_municipios_22[municipio]
+                UF = lista_estados_22[self.dlg.estadoComboBox_22.currentText()][0]
+                layer_setores = QgsVectorLayer(self.plugin_dir+'/dados_IBGE/'+UF+'_setores_CD2022.gpkg', "setores", "ogr")
+                if municipio != '':
+                    # Extrair por atributo
+                    alg_params = {
+                        'FIELD': 'CD_MUN',
+                        'INPUT': layer_setores,
+                        'OPERATOR': 6,
+                        'VALUE': cod_mun,
+                        'OUTPUT': QgsProcessing.TEMPORARY_OUTPUT
+                    }
+                    outputs= processing.run('native:extractbyattribute', alg_params)
+                    layer_setores = outputs['OUTPUT']
+                    
+                layer_setores = self.uni_setor_atributos_22(dict_dados, layer_setores)
+
+                dic_value_name = {}
+                for planilha, list in self.tabela_dados_22.items():
+                    for item in list:
+                        dic_value_name[item[0]] = item[1] +'_'+  planilha
+                print(dic_value_name)
+                layer_setores = self.muda_para_float_altera_nome(layer_setores, dic_value_name, 2022)
+                QgsProject.instance().addMapLayer(layer_setores)
+                layer_setores.setName('Setores_censitários_2022')
+                #define estilo
+
+                layer_setores.loadNamedStyle(self.plugin_dir+'/estilos_camadas/setores_22.qml')
+                layer_setores.triggerRepaint()   
+                if self.dlg.textBrowser_soma_22.toPlainText() != '':
+                    lista_cat = []
+                    items = self.dlg.textBrowser_soma_22.toPlainText().split('+')
+                    nome = 'Categoria'
+                        
+                    field = QgsField( nome, QVariant.Double )
+                    expr = ''
+                    y = 0
+                    for x in items:
+                        if y == 0:
+                            expr = expr + f'"{x}"'
+                        else:
+                            expr = expr + f'+"{x}"'
+                        y = y +1  
+
+
+                    if self.dlg.textBrowser_divi_22.toPlainText() != '':
+                        items = self.dlg.textBrowser_divi_22.toPlainText().split('+')
+                        print(items)
+                        expr = '('+ expr +')/('
+                        y = 0    
+                        for x in items:
+                            if y == 0:
+                                expr = expr + f'"{x}"'
+                            else:
+                                expr = expr + f'+"{x}"'
+                            y = y +1                      
+            
+                        expr =  expr + ')'
+                    layer_setores = self.iface.activeLayer()
+                    layer_setores.addExpressionField(expr, field )
+                    renderer = QgsGraduatedSymbolRenderer() 
+                    renderer.setClassAttribute('Categoria') 
+                    layer_setores.setRenderer(renderer) 
+                    layer_setores.renderer().updateClasses(layer_setores, QgsGraduatedSymbolRenderer.Quantile, 5)
+                    layer_setores.renderer().updateColorRamp(QgsGradientColorRamp(Qt.green, Qt.red)) 
+                    layer_setores.setOpacity(0.4)
+                    self.iface.layerTreeView().refreshLayerSymbology(layer_setores.id())
+                    self.iface.mapCanvas().refreshAllLayers()
+
+                
             pass
