@@ -349,10 +349,11 @@ class DadosCenso:
             progress.setValue(self.i + 1)
             self.i = self.i + 1
             return local_filename
+        
         pasta = self.plugin_dir+'/dados_IBGE'
-        arquivo_tabela = self.plugin_dir+f'/dados_IBGE/Agregados_por_setores_{tabela}_BR.csv'
+        arquivo_tabela = self.plugin_dir+f'/dados_IBGE/Agregados_por_setores_{tabela}.csv'
         if not os.path.isfile(arquivo_tabela):
-            url = f'https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/Agregados_por_Setor_csv/Agregados_por_setores_{tabela}_BR.zip'
+            url = f'https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/Agregados_por_Setor_csv/Agregados_por_setores_{tabela}.zip'
             print(url)
             conexao = ''
             try:
@@ -408,24 +409,22 @@ class DadosCenso:
                   
     def uni_setor_atributos_22(self, dict_dados, layer_setores):
         for planilha, variaveis in dict_dados.items():
-            if planilha != 'Básico':
+            if planilha != 'basico_BR_20250417':
                 print('variaveis', variaveis)
                 print('variaveis')
-                planilha = unicodedata.normalize('NFKD', planilha).encode('ASCII', 'ignore').decode('ASCII').lower()
-                planilha = planilha.replace(' - parte ', '')
-                planilha = planilha.replace(' do ', ' ')
-                planilha = planilha.replace(' ', '_')
                 print(planilha)
-                caminho_planilha = f'{self.plugin_dir}/dados_IBGE/Agregados_por_setores_{planilha}_BR.csv'
+                caminho_planilha = f'{self.plugin_dir}/dados_IBGE/Agregados_por_setores_{planilha}.csv'
                 print(caminho_planilha)
                 layer_planilha = QgsVectorLayer(caminho_planilha, planilha, "ogr")
+                cod_setor_planilha =  layer_planilha.attributeDisplayName(0)
+                
                 
                 #QgsProject.instance().addMapLayer(layer_planilha)
                 alg_params = {
                     'DISCARD_NONMATCHING': False,
                     'FIELD': 'CD_SETOR',
                     'FIELDS_TO_COPY':variaveis,
-                    'FIELD_2': 'CD_setor',
+                    'FIELD_2': cod_setor_planilha,
                     'INPUT': layer_setores,
                     'INPUT_2': layer_planilha,
                     'METHOD': 1,
@@ -862,17 +861,25 @@ class DadosCenso:
                 for x in range(lst.count()):
                     items.append(lst.item(x).text())
                     planilha = lst.item(x).text().split(':')[2][1:]
+                    planilha = unicodedata.normalize('NFKD', planilha).encode('ASCII', 'ignore').decode('ASCII').lower()
+                    planilha = planilha.replace(' - parte ', '')
+                    planilha = planilha.replace(' do ', ' ')
+                    planilha = planilha.replace(' ', '_')
+                    #IBGE mudou o nome de algumas pastas 
+                    if planilha in ('basico', 'caracteristicas_domicilio2', 'caracteristicas_domicilio3'):
+                        planilha = planilha +'_BR_20250417'
+                    else:
+                        planilha = planilha +'_BR'
+
                     coluna = lst.item(x).text().split(':')[0]        
                     if planilha not in dict_dados.keys():
                         dict_dados[planilha] = [coluna]
                     else:
                         dict_dados[planilha].append(coluna)
-                #print(dict_dados)
+                print(dict_dados)
+
+                
                 for planilha in dict_dados.keys():
-                    planilha = unicodedata.normalize('NFKD', planilha).encode('ASCII', 'ignore').decode('ASCII').lower()
-                    planilha = planilha.replace(' - parte ', '')
-                    planilha = planilha.replace(' do ', ' ')
-                    planilha = planilha.replace(' ', '_')
                     self.baixa_tabelas_22(planilha)
                     
                 municipio = self.dlg.municipioComboBox_22.currentText()
